@@ -110,10 +110,13 @@ class GeneratorPage extends StatelessWidget {
     var pair = appState.current;
 
     IconData icon;
+    String snackBarText;
     if (appState.favorites.contains(pair)) {
       icon = Icons.favorite;
+      snackBarText = 'Removed from list!';
     } else {
       icon = Icons.favorite_border;
+      snackBarText = 'Added to list!';
     }
 
     return Center(
@@ -128,6 +131,8 @@ class GeneratorPage extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () {
                   appState.saveFavorites();
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(listSnackBar(snackBarText));
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
@@ -145,6 +150,22 @@ class GeneratorPage extends StatelessWidget {
       ),
     );
   }
+
+  SnackBar listSnackBar(String snackBarText) {
+    return SnackBar(
+      backgroundColor: Colors.green,
+      behavior: SnackBarBehavior.floating,
+      content: Text(snackBarText),
+      duration: const Duration(
+        milliseconds: 1000,
+      ),
+      margin: EdgeInsets.fromLTRB(90.0, 75.0, 75.0, 550.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(50.0),
+      ),
+      showCloseIcon: true,
+    );
+  }
 }
 
 class FavoritesPage extends StatelessWidget {
@@ -154,6 +175,7 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var favorites = appState.favorites;
+    String favoritesText;
 
     if (favorites.isEmpty) {
       return Center(
@@ -161,12 +183,18 @@ class FavoritesPage extends StatelessWidget {
       );
     }
 
+    if (favorites.length == 1) {
+      favoritesText = 'You have ' '${favorites.length}' ' favorite selection!';
+    } else {
+      favoritesText = 'You have ' '${favorites.length}' ' favorite selections!';
+    }
+
     return ListView(
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
           child: Text(
-            'You have ' '${favorites.length} ' 'favorite selections!',
+            favoritesText,
           ),
         ),
         for (var favorite in favorites)
