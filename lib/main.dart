@@ -6,6 +6,23 @@ void main() {
   runApp(MyApp());
 }
 
+SnackBar listSnackBar(String snackBarText, List<double> marginCoordinates) {
+  return SnackBar(
+    backgroundColor: Colors.green,
+    behavior: SnackBarBehavior.floating,
+    content: Text(snackBarText),
+    duration: const Duration(
+      milliseconds: 1000,
+    ),
+    margin: EdgeInsets.fromLTRB(marginCoordinates[0], marginCoordinates[1],
+        marginCoordinates[2], marginCoordinates[3]),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(50.0),
+    ),
+    showCloseIcon: true,
+  );
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -92,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Expanded(
               child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
+                color: Colors.yellow,
                 child: page,
               ),
             ),
@@ -131,8 +148,8 @@ class GeneratorPage extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () {
                   appState.saveFavorites();
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(listSnackBar(snackBarText));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      listSnackBar(snackBarText, [90.0, 75.0, 75.0, 550.0]));
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
@@ -150,27 +167,16 @@ class GeneratorPage extends StatelessWidget {
       ),
     );
   }
-
-  SnackBar listSnackBar(String snackBarText) {
-    return SnackBar(
-      backgroundColor: Colors.green,
-      behavior: SnackBarBehavior.floating,
-      content: Text(snackBarText),
-      duration: const Duration(
-        milliseconds: 1000,
-      ),
-      margin: EdgeInsets.fromLTRB(90.0, 75.0, 75.0, 550.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(50.0),
-      ),
-      showCloseIcon: true,
-    );
-  }
 }
 
-class FavoritesPage extends StatelessWidget {
+class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
 
+  @override
+  State<FavoritesPage> createState() => _FavoritesPageState();
+}
+
+class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -201,6 +207,18 @@ class FavoritesPage extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.favorite),
             title: Text('$favorite'),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                setState(() {
+                  if (favorites.contains(favorite)) {
+                    favorites.remove(favorite);
+                    ScaffoldMessenger.of(context).showSnackBar(listSnackBar(
+                        'Removed from list!', [90.0, 75.0, 75.0, 55.0]));
+                  }
+                });
+              },
+            ),
           )
       ],
     );
